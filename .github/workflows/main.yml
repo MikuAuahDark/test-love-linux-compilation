@@ -107,7 +107,7 @@ jobs:
     - name: Install libpng 1.6.37
       run: cd libpng-1.6.37/build && make install -j$(nproc)
     - name: Download Better CMake
-      run: curl -LO https://github.com/Kitware/CMake/releases/download/v3.19.2/cmake-3.19.2-Linux-x86_64.sh
+      run: curl -LO https://github.com/Kitware/CMake/releases/download/v3.19.2/cmake-3.19.2-Linux-x86_64.sh && mkdir $HOME/cmake
     - name: Install Better CMake
       run: sh cmake-3.19.2-Linux-x86_64.sh --prefix=$HOME/cmake --skip-license
     - name: Checkout Brotli 1.0.9
