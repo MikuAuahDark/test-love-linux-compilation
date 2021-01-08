@@ -1,5 +1,9 @@
-name: continuous-integration
-on: [push, pull_request]
+name: test-build
+on:
+  push:
+  pull-request:
+  schedule:
+    - cron: '0 12 * * 0'
 
 jobs:
   test-linux-portable:
@@ -174,7 +178,7 @@ jobs:
     - name: Patch LuaJIT Makefile
       run: patch LuaJIT-2.1/Makefile important/LuaJITrootmakefile.patch
     - name: Install LuaJIT
-      run: cd LuaJIT-2.1 && LDFLAGS="-Wl,-rpath,'\$\$ORIGIN/../lib'" PREFIX=$INSTALLPREFIX make install -j-j$(nproc)
+      run: cd LuaJIT-2.1 && LDFLAGS="-Wl,-rpath,'\$\$ORIGIN/../lib'" PREFIX=$INSTALLPREFIX make install -j$(nproc)
     - name: Checkout LÖVE
       uses: actions/checkout@v2
       with:
