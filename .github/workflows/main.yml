@@ -139,7 +139,7 @@ jobs:
         repository: kcat/openal-soft
         ref: openal-soft-1.19.1
     - name: Configure OpenAL-soft 1.19.1
-      run: $HOME/cmake/bin/cmake -Bopenal-soft/build -Hopenal-soft -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_RPATH=\$ORIGIN/../lib -DCMAKE_INSTALL_PREFIX=$INSTALLPREFIX -DALSOFT_EXAMPLES=0 -DALSOFT_BACKEND_SNDIO=0 -DALSOFT_BACKEND_SDL2=1
+      run: $HOME/cmake/bin/cmake -Bopenal-soft/build -Hopenal-soft -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_RPATH=\$ORIGIN/../lib -DCMAKE_INSTALL_PREFIX=$INSTALLPREFIX -DALSOFT_EXAMPLES=0 -DALSOFT_BACKEND_SNDIO=0
     - name: Install OpenAL-soft 1.19.1
       run: $HOME/cmake/bin/cmake --build openal-soft/build --target install
     - name: Download Mpg123 1.26.4
