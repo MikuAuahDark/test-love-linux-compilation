@@ -1,0 +1,216 @@
+name: continuous-integration
+on: [push, pull_request]
+
+jobs:
+  test-linux-portable:
+    runs-on: ubuntu-16.04
+    env:
+      INSTALLPREFIX: /tmp/lovebuild/love-master
+    steps:
+    - name: Update APT
+      run: sudo apt-get update
+    - name: Install Dependencies
+      run: |
+        sudo apt-get install --assume-yes build-essential autoconf automake \
+        autotools-dev pkg-config curl unzip \
+        libtool libasound2-dev libpulse-dev libaudio-dev libx11-dev libxext-dev \
+        libxrandr-dev libxcursor-dev libxi-dev libxinerama-dev libxxf86vm-dev \
+        libxss-dev libgl1-mesa-dev libdbus-1-dev libudev-dev libgles2-mesa-dev \
+        libegl1-mesa-dev libibus-1.0-dev fcitx-libs-dev libsamplerate0-dev \
+        libxkbcommon-dev
+    - name: Create Directory
+      run: mkdir -p $INSTALLPREFIX
+    - name: Download SDL 2.0.14
+      run: curl -LO https://libsdl.org/release/SDL2-2.0.14.tar.gz
+    - name: Extract SDL 2.0.14
+      run: tar xzf SDL2-2.0.14.tar.gz
+    - name: Configure SDL 2.0.14
+      run: |
+        cd SDL2-2.0.14 || exit 1
+        mkdir build || exit 1
+        cd build || exit 1
+        LDFLAGS="-Wl,-rpath,'\$\$ORIGIN/../lib'" ../configure --prefix=$INSTALLPREFIX --disable-video-wayland || exit 1
+    - name: Install SDL 2.0.14
+      run: cd SDL2-2.0.14/build && make install -j$(nproc)
+    - name: Download libogg 1.3.4
+      run: curl -LO https://downloads.xiph.org/releases/ogg/libogg-1.3.4.tar.gz
+    - name: Extract libogg 1.3.4
+      run: tar xzf libogg-1.3.4.tar.gz
+    - name: Configure libogg 1.3.4
+      run: |
+        cd libogg-1.3.4 || exit 1
+        mkdir build || exit 1
+        cd build || exit 1
+        LDFLAGS="-Wl,-rpath,'\$\$ORIGIN/../lib'" ../configure --prefix=$INSTALLPREFIX || exit 1
+    - name: Install libogg 1.3.4
+      run: cd libogg-1.3.4/build && make install -j$(nproc)
+    - name: Download libvorbis 1.3.7
+      run: curl -LO https://downloads.xiph.org/releases/vorbis/libvorbis-1.3.7.tar.gz
+    - name: Extract libvorbis 1.3.7
+      run: tar xzf libvorbis-1.3.7.tar.gz
+    - name: Configure libvorbis 1.3.7
+      run: |
+        cd libvorbis-1.3.7 || exit 1
+        mkdir build || exit 1
+        cd build || exit 1
+        LDFLAGS="-Wl,-rpath,'\$\$ORIGIN/../lib'" ../configure --prefix=$INSTALLPREFIX || exit 1
+    - name: Install libvorbis 1.3.7
+      run: cd libvorbis-1.3.7/build && make install -j$(nproc)
+    - name: Download libtheora 1.1.1
+      run: curl -LO https://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2
+    - name: Extract libtheora 1.1.1
+      run: tar xf libtheora-1.1.1.tar.bz2
+    - name: Configure libtheora 1.1.1
+      run: |
+        cd libtheora-1.1.1 || exit 1
+        mkdir build || exit 1
+        cd build || exit 1
+        LDFLAGS="-Wl,-rpath,'\$\$ORIGIN/../lib'" ../configure --prefix=$INSTALLPREFIX || exit 1
+    - name: Install libtheora 1.1.1
+      run: cd libtheora-1.1.1/build && make install -j$(nproc)
+    - name: Checkout zlib 1.2.11
+      uses: actions/checkout@v2
+      with:
+        path: zlib
+        repository: madler/zlib
+        ref: v1.2.11
+    - name: Configure zlib 1.2.11
+      run: |
+        cd zlib || exit 1
+        mkdir build || exit 1
+        cd build || exit 1
+        LDFLAGS="-Wl,-rpath,'\$\$ORIGIN/../lib'" ../configure --prefix=$INSTALLPREFIX || exit 1
+    - name: Install zlib 1.2.11
+      run: cd zlib/build && make install -j$(nproc)
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        path: important
+    - name: Download BZip2 1.0.8
+      run: curl -LO https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz
+    - name: Extract BZip2 1.0.8
+      run: tar xzf bzip2-1.0.8.tar.gz
+    - name: Patch BZip2 Makefile
+      run: patch bzip2-1.0.8/Makefile important/bzip2makefile.patch
+    - name: Install BZip2 1.0.8
+      run: cd bzip2-1.0.8 && LDFLAGS="-Wl,-rpath,'\$\$ORIGIN/../lib'" PREFIX=$INSTALLPREFIX make install -j$(nproc)
+    - name: Download libpng 1.6.37
+      run: curl -Lo libpng-1.6.37.tar.gz http://prdownloads.sourceforge.net/libpng/libpng-1.6.37.tar.gz?download
+    - name: Extract libpng 1.6.37
+      run: tar xzf libpng-1.6.37.tar.gz
+    - name: Configure libpng 1.6.37
+      run: |
+        cd libpng-1.6.37 || exit 1
+        mkdir build || exit 1
+        cd build || exit 1
+        LDFLAGS="-Wl,-rpath,'\$\$ORIGIN/../lib'" ../configure --prefix=$INSTALLPREFIX || exit 1
+    - name: Install libpng 1.6.37
+      run: cd libpng-1.6.37/build && make install -j$(nproc)
+    - name: Download Better CMake
+      run: curl -LO https://github.com/Kitware/CMake/releases/download/v3.19.2/cmake-3.19.2-Linux-x86_64.sh
+    - name: Install Better CMake
+      run: sh cmake-3.19.2-Linux-x86_64.sh --prefix=$HOME/cmake --skip-license
+    - name: Checkout Brotli 1.0.9
+      uses: actions/checkout@v2
+      with:
+        path: brotli
+        repository: google/brotli
+        ref: v1.0.9
+    - name: Configure Brotli 1.0.9
+      run: $HOME/cmake/bin/cmake -Bbrotli/build -Hbrotli -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_RPATH=\$ORIGIN/../lib -DCMAKE_INSTALL_PREFIX=$INSTALLPREFIX
+    - name: Install Brotli 1.0.9
+      run: $HOME/cmake/bin/cmake --build brotli/build --target install
+    - name: Download FreeType 2.10.4
+      run: curl -LO https://download.savannah.gnu.org/releases/freetype/freetype-2.10.4.tar.gz
+    - name: Extract FreeType 2.0.14
+      run: tar xzf freetype-2.10.4.tar.gz
+    - name: Configure FreeType 2.10.4
+      run: |
+        cd freetype-2.10.4 || exit 1
+        mkdir build || exit 1
+        cd build || exit 1
+        CFLAGS="-I$INSTALLPREFIX/include" LDFLAGS="-Wl,-rpath,'\$\$ORIGIN/../lib' -L$INSTALLPREFIX/lib" PKG_CONFIG_PATH=$$INSTALLPREFIX/lib/pkgconfig ../configure --prefix=$INSTALLPREFIX || exit 1
+    - name: Install FreeType 2.10.4
+      run: cd freetype-2.10.4/build && make install -j$(nproc)
+    - name: Checkout OpenAL-soft 1.19.1
+      uses: actions/checkout@v2
+      with:
+        path: openal-soft
+        repository: kcat/openal-soft
+        ref: openal-soft-1.19.1
+    - name: Configure OpenAL-soft 1.19.1
+      run: $HOME/cmake/bin/cmake -Bopenal-soft/build -Hopenal-soft -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_RPATH=\$ORIGIN/../lib -DCMAKE_INSTALL_PREFIX=$INSTALLPREFIX -DALSOFT_EXAMPLES=0 -DALSOFT_BACKEND_SNDIO=0 -DALSOFT_BACKEND_SDL2=1
+    - name: Install OpenAL-soft 1.19.1
+      run: $HOME/cmake/bin/cmake --build openal-soft/build --target install
+    - name: Download Mpg123 1.26.4
+      run: curl -LO https://www.mpg123.de/download/mpg123-1.26.4.tar.bz2
+    - name: Extract Mpg123 1.26.4
+      run: tar xf mpg123-1.26.4.tar.bz2
+    - name: Configure Mpg123 1.26.4
+      run: |
+        cd mpg123-1.26.4 || exit 1
+        mkdir builddir || exit 1
+        cd builddir || exit 1
+        LDFLAGS="-Wl,-rpath,'\$\$ORIGIN/../lib'" ../configure --prefix=$INSTALLPREFIX || exit 1
+    - name: Install Mpg123 1.26.4
+      run: cd mpg123-1.26.4/builddir && make install -j$(nproc)
+    - name: Download libmodplug 0.8.8.5
+      run: curl -Lo libmodplug-0.8.8.5.tar.gz http://sourceforge.net/projects/modplug-xmms/files/libmodplug/0.8.8.5/libmodplug-0.8.8.5.tar.gz/download
+    - name: Extract libmodplug 0.8.8.5
+      run: tar xzf libmodplug-0.8.8.5.tar.gz
+    - name: Configure libmodplug 0.8.8.5
+      run: |
+        cd libmodplug-0.8.8.5 || exit 1
+        mkdir build || exit 1
+        cd build || exit 1
+        LDFLAGS="-Wl,-rpath,'\$\$ORIGIN/../lib'" ../configure --prefix=$INSTALLPREFIX || exit 1
+    - name: Install libmodplug 0.8.8.5
+      run: cd libmodplug-0.8.8.5/build && make install -j$(nproc)
+    - name: Checkout LuaJIT
+      uses: actions/checkout@v2
+      with:
+        path: LuaJIT-2.1
+        repository: LuaJIT/LuaJIT
+    - name: Patch LuaJIT Makefile
+      run: patch LuaJIT-2.1/Makefile important/LuaJITrootmakefile.patch
+    - name: Install LuaJIT
+      run: cd LuaJIT-2.1 && LDFLAGS="-Wl,-rpath,'\$\$ORIGIN/../lib'" PREFIX=$INSTALLPREFIX make install -j-j$(nproc)
+    - name: Checkout LÖVE
+      uses: actions/checkout@v2
+      with:
+        path: love
+        repository: love2d/love
+        ref: master
+    - name: Do some automake stuff
+      run: cd love && platform/unix/automagic
+    - name: Configure LÖVE
+      run: |
+        cd love || exit 1
+        mkdir build || exit 1
+        cd build || exit 1
+        CFLAGS="-I$INSTALLPREFIX/include" LDFLAGS="-Wl,-rpath,'\$\$ORIGIN/../lib' -L$INSTALLPREFIX/lib" PKG_CONFIG_PATH=$INSTALLPREFIX/lib/pkgconfig ../configure --prefix=$INSTALLPREFIX || exit 1
+    - name: Install LÖVE
+      run: cd love/build && make install -j$(nproc)
+    - name: Cleanup Installdir
+      run: |
+        cd $INSTALLPREFIX || exit 1
+        rm -rf man include || exit 1
+        cd bin || exit 1
+        mv love ../love || exit 1
+        rm -rf * || exit 1
+        mv ../love love || exit 1
+        strip love || exit 1
+        cd .. || exit 1
+        cd share || exit 1
+        rm -rf aclocal doc man || exit 1
+        cd .. || exit 1
+        cd lib || exit 1
+        rm -rf mpg123 cmake pkgconfig *.a *.la
+        strip *
+        cd ../..
+        tar zcf ../love-master.tar.gz love-master
+    - name: Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: love-master-linux-portable
+        path: /tmp/love-master.tar.gz
