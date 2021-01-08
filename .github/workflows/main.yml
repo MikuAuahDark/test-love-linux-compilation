@@ -65,7 +65,7 @@ jobs:
         cd libtheora-1.1.1 || exit 1
         mkdir build || exit 1
         cd build || exit 1
-        LDFLAGS="-Wl,-rpath,'\$\$ORIGIN/../lib'" ../configure --prefix=$INSTALLPREFIX || exit 1
+        LDFLAGS="-Wl,-rpath,'\$\$ORIGIN/../lib'" ../configure --prefix=$INSTALLPREFIX --with-ogg=$INSTALLPREFIX --with-vorbis=$INSTALLPREFIX --disable-examples --disable-encode || exit 1
     - name: Install libtheora 1.1.1
       run: cd libtheora-1.1.1/build && make install -j$(nproc)
     - name: Checkout zlib 1.2.11
