@@ -185,8 +185,20 @@ jobs:
         path: love
         repository: love2d/love
         ref: master
-    - name: Do some automake stuff
-      run: cd love && platform/unix/automagic
+    - name: Generate Modules
+      run: cd love && bash platform/unix/genmodules
+    - name: Copy autotools file
+      run: cp love/platform/unix/configure.ac love && cp love/platform/unix/Makefile.am love
+    - name: Run autoheader
+      run: cd love && autoheader
+    - name: Run libtoolize
+      run: cd love && libtoolize --force
+    - name: Run aclocal
+      run: cd love && aclocal -I $INSTALLPREFIX/share/aclocal
+    - name: Run autoconf
+      run: cd love && autoconf -I$INSTALLPREFIX
+    - name: Run automake
+      run: cd love && automake -a
     - name: Configure LÖVE
       run: |
         cd love || exit 1
