@@ -222,7 +222,7 @@ jobs:
         cd .. || exit 1
         cd lib || exit 1
         rm -rf mpg123 cmake pkgconfig *.a *.la
-        strip *
+        strip * || true
         cd ../..
         tar zcf ../love-master.tar.gz love-master
     - name: Artifact
