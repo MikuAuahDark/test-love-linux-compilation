@@ -126,14 +126,14 @@ jobs:
       run: $HOME/cmake/bin/cmake --build brotli/build --target install
     - name: Download FreeType 2.10.4
       run: curl -LO https://download.savannah.gnu.org/releases/freetype/freetype-2.10.4.tar.gz
-    - name: Extract FreeType 2.0.14
+    - name: Extract FreeType 2.10.4
       run: tar xzf freetype-2.10.4.tar.gz
     - name: Configure FreeType 2.10.4
       run: |
         cd freetype-2.10.4 || exit 1
         mkdir build || exit 1
         cd build || exit 1
-        CFLAGS="-I$INSTALLPREFIX/include" LDFLAGS="-Wl,-rpath,'\$\$ORIGIN/../lib' -L$INSTALLPREFIX/lib" PKG_CONFIG_PATH=$$INSTALLPREFIX/lib/pkgconfig ../configure --prefix=$INSTALLPREFIX || exit 1
+        CFLAGS="-I$INSTALLPREFIX/include" LDFLAGS="-Wl,-rpath,'\$\$ORIGIN/../lib' -L$INSTALLPREFIX/lib -Wl,--no-undefined" PKG_CONFIG_PATH=$$INSTALLPREFIX/lib/pkgconfig ../configure --prefix=$INSTALLPREFIX || exit 1
     - name: Install FreeType 2.10.4
       run: cd freetype-2.10.4/build && make install -j$(nproc)
     - name: Checkout OpenAL-soft 1.19.1
